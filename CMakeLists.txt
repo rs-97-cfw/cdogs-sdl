@@ -9,6 +9,8 @@ endif()
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.6)
 project(cdogs-sdl C)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "6")
 SET(VERSION_PATCH "0")
@@ -23,9 +25,7 @@ option(DEBUG_PROFILE "Enable debug profile build" OFF)
 # check for crosscompiling (defined when using a toolchain file)
 if(CMAKE_CROSSCOMPILING)
 	# check for gcw0
-	if(CMAKE_C_COMPILER MATCHES ".*gcw0-linux.*")
-		set(GCW0 1)
-	endif()
+	set(GCW0 1)
 endif()
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
@@ -61,7 +61,7 @@ IF(WIN32)
     SET(WINDOWS_ENET_DEPENDENCIES "ws2_32;winmm")
     SET(ENet_LIBRARIES ${ENet_LIBRARY} ${WINDOWS_ENET_DEPENDENCIES})
 ELSE()
-    SET(ENet_LIBRARIES ${ENet_LIBRARY})
+    SET(ENet_LIBRARIES ${ENet_LIBRARY} "-Wl,--start-group -lc -lgcc -lm -lSDL -lSDL_image -ljpeg -lpng -lSDL_mixer -lmpg123 -lmikmod -logg -lvorbisidec -lz -Wl,--end-group -s")
 ENDIF()
 INCLUDE_DIRECTORIES(src/cdogs/enet/include)
 
@@ -121,12 +121,11 @@ else()
         # Probably GCC...
         add_definitions(-freg-struct-return -std=gnu99)
 		if(NOT APPLE AND NOT BEOS AND NOT HAIKU)
-			add_definitions(-Wshadow)
+			add_definitions(-Wshadow -Ofast)
 		endif()
 	endif()
 	if(NOT BEOS AND NOT HAIKU)
-		add_definitions(-Winline -Werror)
-		set(EXTRA_LIBRARIES "m")
+		add_definitions(-Winline)
 	endif()
 endif()
 
@@ -176,10 +175,6 @@ set_target_properties(cdogs-sdl PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/src
 	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/src
 )
-set_target_properties(cdogs-sdl-editor PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/src
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/src
-)
 
 ################
 # Installation #
@@ -204,7 +199,7 @@ if(APPLE)
 		USE_SOURCE_PERMISSIONS)
 else()
 	install(
-		PROGRAMS src/cdogs-sdl${EXE_EXTENSION} src/cdogs-sdl-editor${EXE_EXTENSION}
+		PROGRAMS src/cdogs-sdl${EXE_EXTENSION}
 		DESTINATION ${INSTALL_PREFIX}/bin)
 endif()
 
@@ -243,7 +238,7 @@ SET(CPACK_PACKAGE_VERSION ${VERSION})
 SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-SET(CPACK_PACKAGE_EXECUTABLES "cdogs-sdl;C-Dogs SDL;cdogs-sdl-editor;Campaign Editor")
+SET(CPACK_PACKAGE_EXECUTABLES "cdogs-sdl;C-Dogs SDL")
 if(WIN32)
 	SET(CPACK_GENERATOR NSIS)
 	SET(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
@@ -295,6 +290,7 @@ else()
 	set(CPACK_RPM_PACKAGE_LICENSE "GPL2")
 	set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games/Action/Arcade")
 	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_image >= 1.2, sdl_mixer >= 1.2")
-
 endif()
+
+
 include(CPack)

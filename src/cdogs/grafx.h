@@ -90,6 +90,7 @@ typedef struct
 	int IsWindowInitialized;
 	SDL_Surface *icon;
 	SDL_Surface *screen;
+	SDL_Surface *ScreenSurface;
 	Uint32 Amask;
 	Uint8 Ashift;
 	GraphicsConfig cachedConfig;

@@ -636,11 +636,15 @@ void BlitFlip(GraphicsDevice *g)
 		return;
 	}
 
-	if (scalef == 1)
+	//if (scalef == 1)
 	{
 		memcpy(pScreen, g->buf, sizeof *pScreen * memSize);
+		SDL_Surface *tmp = SDL_DisplayFormat(g->screen);
+		SDL_BlitSurface(tmp, NULL, g->ScreenSurface, NULL);
+		SDL_FreeSurface(tmp);
+		//memcpy(pScreen, g->buf, sizeof *pScreen * memSize);
 	}
-	else if (ConfigGetEnum(&gConfig, "Graphics.ScaleMode") == SCALE_MODE_BILINEAR)
+	/*else if (ConfigGetEnum(&gConfig, "Graphics.ScaleMode") == SCALE_MODE_BILINEAR)
 	{
 		Bilinear(pScreen, g->buf, size.x, size.y, scalef);
 	}
@@ -665,8 +669,9 @@ void BlitFlip(GraphicsDevice *g)
 	else
 	{
 		Scale8(pScreen, g->buf, size.x, size.y, scalef);
-	}
+	}*/
 
 	SDL_UnlockSurface(g->screen);
-	SDL_Flip(g->screen);
+	//SDL_Flip(g->screen);
+	SDL_Flip(g->ScreenSurface);
 }

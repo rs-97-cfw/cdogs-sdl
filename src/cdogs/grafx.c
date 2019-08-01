@@ -299,7 +299,9 @@ void GraphicsInitialize(GraphicsDevice *g, const bool force)
 	LOG(LM_MAIN, LL_INFO, "graphics mode(%dx%d %dx) actual(%dx%d)",
 		w, h, g->cachedConfig.ScaleFactor, rw, rh);
 	SDL_FreeSurface(g->screen);
-	g->screen = SDL_SetVideoMode(rw, rh, 32, sdl_flags);
+	//g->screen = SDL_SetVideoMode(rw, rh, 16, sdl_flags);
+	g->ScreenSurface = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE);
+	g->screen = SDL_CreateRGBSurface(SDL_SWSURFACE, rw, rh, 32, 0, 0, 0, 0);
 	if (g->screen == NULL)
 	{
 		printf("ERROR: InitVideo: %s\n", SDL_GetError());
